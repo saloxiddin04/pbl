@@ -20,10 +20,30 @@ private:
     string familiya;
     string fakultet;
     double ball;
+    string role;
     
 public:
     vector<Abituryent> abiturientlar;
+    
+    void setRole(const string& userRole) {
+        role = userRole;
+    }
+    
+    void Table() {
+        cout<<left<<setw(5)<<"ID"
+            <<setw(15)<<"Ism"
+            <<setw(15)<<"Familiya"
+            <<setw(15)<<"Fakultet"
+            <<setw(15)<<"Ball"<<endl;
+            cout << "------------------------------------------------------------" << endl;
+    }
+    
     void createAbiturient() {
+        
+        if (role != "admin") {
+            cout << "\nSizda abiturient qo'shish huquqi yo'q." << endl;
+            return;
+        }
         Abituryent newAbituriyent;
         cout << "Abiturientning ID raqamini kiriting: ";
         cin >> newAbituriyent.id;
@@ -50,14 +70,16 @@ public:
             cout << "Hozircha ro'yxatda abiturientlar yo'q." << endl;
             return;
         }
+        
+        cout << "\n";
+        Table();
 
         for (const auto& abiturient : abiturientlar) {
-            cout << "ID: " << abiturient.id << endl;
-            cout << "Ism: " << abiturient.ism << endl;
-            cout << "Familiya: " << abiturient.familiya << endl;
-            cout << "Fakultet: " << abiturient.fakultet << endl;
-            cout << "Ball: " << abiturient.ball << endl;
-            cout << "--------------------------" << endl;
+            cout<<left<<setw(5)<<abiturient.id
+                <<setw(15)<<abiturient.ism
+                <<setw(15)<<abiturient.familiya
+                <<setw(15)<<abiturient.fakultet
+                <<setw(15)<<abiturient.ball<<endl;
         }
     }
     
@@ -135,8 +157,38 @@ public:
     }
 };
 
+bool login(Abituryent & abi) {
+    string username, password;
+    const string adminUsername = "admin";
+    const string adminPassword = "admin";
+    
+    const string teacherUsername = "teacher";
+    const string teacherPassword = "teacher";
+    
+    cout << "username: "; cin >> username;
+    cout << "password: "; cin >> password;
+    
+    if (username == adminUsername && password == adminPassword) {
+        abi.setRole("admin");
+        cout << "\nAdmin sifatida tizimga kirdingiz." << endl;
+        return true;
+    } else if (username == teacherUsername && password == teacherPassword) {
+        abi.setRole("teacher");
+        cout << "\nO'qituvchi sifatida tizimga kirdingiz." << endl;
+        return true;
+    } else {
+        cout << "\nNoto'g'ri username yoki parol." << endl;
+        return false;
+    }
+};
+
 void menyu() {
     Abituryent abi;
+    
+    if (!login(abi)) {
+        return;
+    }
+    
     int tanlov;
     do {
         cout << "\n====== Abiturientlarni ro'yxatga olish tizimi ======" << endl;
