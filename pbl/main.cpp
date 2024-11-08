@@ -49,6 +49,13 @@ public:
         cin >> newAbituriyent.id;
         cin.ignore();
         
+        for (const auto& abiturient : abiturientlar) {
+            if (abiturient.id == newAbituriyent.id) {
+                cout << "\nBu ID raqam allaqachon mavjud. Iltimos, boshqa ID kiriting."<<endl;
+                return;
+            }
+        }
+        
         cout << "Ism kiriting: ";
         getline(cin, newAbituriyent.ism);
 
