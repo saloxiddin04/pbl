@@ -18,8 +18,14 @@ private:
     int id;
     string ism;
     string familiya;
+    string midd_name;
     string fakultet;
-    double ball;
+    string phone_number;
+    string address;
+    string lesson_language;
+    int jinsi;
+    string lang_certification;
+    string lang_lavel;
     string role;
     
 public:
@@ -33,8 +39,8 @@ public:
         cout<<left<<setw(5)<<"ID"
             <<setw(15)<<"Ism"
             <<setw(15)<<"Familiya"
-            <<setw(15)<<"Fakultet"
-            <<setw(15)<<"Ball"<<endl;
+            <<setw(15)<<"Otasi ismi"
+        <<setw(15)<<"Fakultet" << endl;
             cout << "------------------------------------------------------------" << endl;
     }
     
@@ -61,12 +67,24 @@ public:
 
         cout << "Familiya kiriting: ";
         getline(cin, newAbituriyent.familiya);
+        
+        cout << "Otasini ismi kiriting: ";
+        getline(cin, newAbituriyent.midd_name);
+        
+        if (newAbituriyent.midd_name.empty()) {
+            newAbituriyent.midd_name = "xxx";
+        }
 
         cout << "Fakultet kiriting: ";
         getline(cin, newAbituriyent.fakultet);
+        
+        cout << "Til sertifikati (sertifikat mavjud bo'lsa kiriting, aks holda bo'sh qoldiring): ";
+            getline(cin, newAbituriyent.lang_certification);
 
-        cout << "Ballni kiriting: ";
-        cin >> newAbituriyent.ball;
+            if (!newAbituriyent.lang_certification.empty()) {
+                cout << "Til darajasini kiriting: ";
+                getline(cin, newAbituriyent.lang_lavel);
+            }
 
         abiturientlar.push_back(newAbituriyent);
         cout << "\nAbiturient muvaffaqiyatli qo'shildi!" << endl;
@@ -85,8 +103,8 @@ public:
             cout<<left<<setw(5)<<abiturient.id
                 <<setw(15)<<abiturient.ism
                 <<setw(15)<<abiturient.familiya
-                <<setw(15)<<abiturient.fakultet
-                <<setw(15)<<abiturient.ball<<endl;
+            <<setw(15)<<abiturient.midd_name
+            <<setw(15)<<abiturient.fakultet << endl;
         }
     }
     
@@ -101,8 +119,8 @@ public:
                 cout << "ID: " << abiturient.id << endl;
                 cout << "Ism: " << abiturient.ism << endl;
                 cout << "Familiya: " << abiturient.familiya << endl;
+                cout << "Otasi ismi: " << abiturient.midd_name << endl;
                 cout << "Fakultet: " << abiturient.fakultet << endl;
-                cout << "Ball: " << abiturient.ball << endl;
                 topildi = true;
                 break;
             }
@@ -122,8 +140,8 @@ public:
         cout<<left<<setw(5)<<"ID"
             <<setw(15)<<"Ism"
             <<setw(15)<<"Familiya"
-            <<setw(15)<<"Fakultet"
-            <<setw(15)<<"Ball"<<endl;
+            <<setw(15)<<"Otasini ismi"
+        <<setw(15)<<"Fakultet" << endl;
             cout << "------------------------------------------------------------" << endl;
 
         for(int i = 0; i < abiturientlar.size(); i++) {
@@ -131,8 +149,8 @@ public:
                 cout<<left<<setw(5)<<abiturientlar[i].id
                     <<setw(15)<<abiturientlar[i].ism
                     <<setw(15)<<abiturientlar[i].familiya
-                    <<setw(15)<<abiturientlar[i].fakultet
-                    <<setw(15)<<abiturientlar[i].ball<<endl;
+                <<setw(15)<<abiturientlar[i].midd_name
+                <<setw(15)<<abiturientlar[i].fakultet << endl;
                 topildi = true;
             }
         }
