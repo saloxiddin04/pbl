@@ -36,13 +36,22 @@ public:
     }
     
     void Table() {
-        cout<<left<<setw(5)<<"ID"
-            <<setw(15)<<"Ism"
-            <<setw(15)<<"Familiya"
-            <<setw(15)<<"Otasi ismi"
-        <<setw(15)<<"Fakultet" << endl;
-            cout << "------------------------------------------------------------" << endl;
+        cout << left
+             << setw(5) << "ID"
+             << setw(15) << "Ism"
+             << setw(15) << "Familiya"
+             << setw(20) << "Otasi ismi"
+             << setw(10) << "Jinsi"
+             << setw(15) << "Fakultet"
+             << setw(25) << "Manzil"
+             << setw(15) << "Telefon"
+             << setw(20) << "Dars Tili"
+             << setw(20) << "Til Sert."
+             << setw(15) << "Til Dar."
+             << endl;
+        cout << "------------------------------------------------------------------------------------------------------------------------" << endl;
     }
+
     
     void createAbiturient() {
         
@@ -51,8 +60,7 @@ public:
             return;
         }
         Abituryent newAbituriyent;
-        cout << "Abiturientning ID raqamini kiriting: ";
-        cin >> newAbituriyent.id;
+        newAbituriyent.id = abiturientlar.size() + 1;
         cin.ignore();
         
         for (const auto& abiturient : abiturientlar) {
@@ -74,9 +82,22 @@ public:
         if (newAbituriyent.midd_name.empty()) {
             newAbituriyent.midd_name = "xxx";
         }
+        
+        cout << "Yashash manzil kiriting: ";
+        getline(cin, newAbituriyent.address);
+        
+        cout << "Telefon raqam kiriting(+998 99 999 99 99): ";
+        getline(cin, newAbituriyent.phone_number);
+        
+        cout << "Jinsi kiriting(erkak: 1, ayol: 2): ";
+        cin >> newAbituriyent.jinsi;
+        cin.ignore();
 
         cout << "Fakultet kiriting: ";
         getline(cin, newAbituriyent.fakultet);
+        
+        cout << "Fakultet tili kiriting(uz, ru, en): ";
+        getline(cin, newAbituriyent.lesson_language);
         
         cout << "Til sertifikati (sertifikat mavjud bo'lsa kiriting, aks holda bo'sh qoldiring): ";
             getline(cin, newAbituriyent.lang_certification);
@@ -95,18 +116,27 @@ public:
             cout << "Hozircha ro'yxatda abiturientlar yo'q." << endl;
             return;
         }
-        
+
         cout << "\n";
         Table();
 
         for (const auto& abiturient : abiturientlar) {
-            cout<<left<<setw(5)<<abiturient.id
-                <<setw(15)<<abiturient.ism
-                <<setw(15)<<abiturient.familiya
-            <<setw(15)<<abiturient.midd_name
-            <<setw(15)<<abiturient.fakultet << endl;
+            cout << left
+                 << setw(5) << abiturient.id
+                 << setw(15) << abiturient.ism
+                 << setw(15) << abiturient.familiya
+                 << setw(20) << abiturient.midd_name
+                 << setw(10) << (abiturient.jinsi == 1 ? "Erkak" : "Ayol")
+                 << setw(15) << abiturient.fakultet
+                 << setw(25) << abiturient.address
+                 << setw(15) << abiturient.phone_number
+                 << setw(20) << abiturient.lesson_language
+                 << setw(20) << abiturient.lang_certification
+                 << setw(15) << abiturient.lang_lavel
+                 << endl;
         }
     }
+
     
     void abiturientIzlash() {
         int id;
@@ -120,7 +150,13 @@ public:
                 cout << "Ism: " << abiturient.ism << endl;
                 cout << "Familiya: " << abiturient.familiya << endl;
                 cout << "Otasi ismi: " << abiturient.midd_name << endl;
+                cout << "Telefon raqam: " << abiturient.phone_number << endl;
+                cout << "Yashash manzil: " << abiturient.address << endl;
+                cout << "Jinsi: " << (abiturient.jinsi == 1 ? "Erkak" : "Ayol") << endl;
                 cout << "Fakultet: " << abiturient.fakultet << endl;
+                cout << "Dars tili: " << abiturient.lesson_language << endl;
+                cout << "Til sertifikati: " << abiturient.lang_certification << endl;
+                cout << "Til darajasi: " << abiturient.lang_lavel << endl;
                 topildi = true;
                 break;
             }
@@ -136,22 +172,25 @@ public:
         string name;
         cout<<"Ism kiriting: "; cin>>name;
         bool topildi = false;
+        
+        cout << "\n";
+        Table();
 
-        cout<<left<<setw(5)<<"ID"
-            <<setw(15)<<"Ism"
-            <<setw(15)<<"Familiya"
-            <<setw(15)<<"Otasini ismi"
-        <<setw(15)<<"Fakultet" << endl;
-            cout << "------------------------------------------------------------" << endl;
-
-        for(int i = 0; i < abiturientlar.size(); i++) {
-            if(abiturientlar[i].ism == name) {
-                cout<<left<<setw(5)<<abiturientlar[i].id
-                    <<setw(15)<<abiturientlar[i].ism
-                    <<setw(15)<<abiturientlar[i].familiya
-                <<setw(15)<<abiturientlar[i].midd_name
-                <<setw(15)<<abiturientlar[i].fakultet << endl;
-                topildi = true;
+        for (const auto& abiturient : abiturientlar) {
+            if (abiturient.ism == name) {
+                cout << left
+                     << setw(5) << abiturient.id
+                     << setw(15) << abiturient.ism
+                     << setw(15) << abiturient.familiya
+                     << setw(20) << abiturient.midd_name
+                     << setw(10) << (abiturient.jinsi == 1 ? "Erkak" : "Ayol")
+                     << setw(15) << abiturient.fakultet
+                     << setw(25) << abiturient.address
+                     << setw(15) << abiturient.phone_number
+                     << setw(20) << abiturient.lesson_language
+                     << setw(20) << abiturient.lang_certification
+                     << setw(15) << abiturient.lang_lavel
+                     << endl;
             }
         }
 
