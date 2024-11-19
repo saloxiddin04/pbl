@@ -10,6 +10,8 @@
 #include <vector>
 #include <string>
 #include <iomanip>
+#include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -68,6 +70,8 @@ public:
     
     void createAbiturient() {
         
+        ofstream file("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt", ios::app);
+        
         if (role != "admin") {
             cout << "\nSizda abiturient qo'shish huquqi yo'q." << endl;
             return;
@@ -107,6 +111,27 @@ public:
 
         abiturientlar.push_back(newAbituriyent);
         cout << "\nAbiturient muvaffaqiyatli qo'shildi!" << endl;
+        
+        if (file.is_open()) {
+            file << "ID: " << newAbituriyent.id << endl;
+            file << "Ism: " << newAbituriyent.ism << endl;
+            file << "Familiya: " << newAbituriyent.familiya << endl;
+            file << "Otasining ismi: " << newAbituriyent.midd_name << endl;
+            file << "Yashash manzil: " << newAbituriyent.address << endl;
+            file << "Telefon raqam: " << newAbituriyent.phone_number << endl;
+            file << "Jinsi: " << (newAbituriyent.jinsi == 1 ? "erkak" : "ayol") << endl;
+            file << "Fakultet: " << newAbituriyent.fakultet << endl;
+            file << "Fakultet tili: " << newAbituriyent.lesson_language << endl;
+            file << "Til sertifikati: " << (newAbituriyent.lang_certification.empty() ? "Yo'q" : newAbituriyent.lang_certification) << endl;
+            if (!newAbituriyent.lang_certification.empty()) {
+                file << "Til darajasi: " << newAbituriyent.lang_lavel << endl;
+            }
+            file << "----------------------" << endl;
+
+            file.close();
+        } else {
+            cout << "Fayl ochilmadi!" << endl;
+        }
     }
     
     void abiturientlarniKorish() {
@@ -225,8 +250,8 @@ bool login(Abituryent & abi) {
     const string adminUsername = "admin";
     const string adminPassword = "admin";
     
-    const string teacherUsername = "teacher";
-    const string teacherPassword = "teacher";
+    const string employeeUsername = "employee";
+    const string employeePassword = "employee";
     
     cout << "username: "; cin >> username;
     cout << "password: "; cin >> password;
@@ -235,9 +260,9 @@ bool login(Abituryent & abi) {
         abi.setRole("admin");
         cout << "\nAdmin sifatida tizimga kirdingiz." << endl;
         return true;
-    } else if (username == teacherUsername && password == teacherPassword) {
+    } else if (username == employeeUsername && password == employeePassword) {
         abi.setRole("teacher");
-        cout << "\nO'qituvchi sifatida tizimga kirdingiz." << endl;
+        cout << "\nXodim sifatida tizimga kirdingiz." << endl;
         return true;
     } else {
         cout << "\nNoto'g'ri username yoki parol." << endl;
