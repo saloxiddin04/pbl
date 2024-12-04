@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
 
 using namespace std;
 
@@ -51,7 +52,7 @@ public:
              << setw(20) << "Til Sert."
              << setw(15) << "Til Dar."
              << endl;
-        cout << string(150, '-') << endl;
+        cout << string(170, '-') << endl;
     }
     
     string getRequiredInput(string props) {
@@ -65,6 +66,18 @@ public:
         }
 
         return input;
+    }
+    
+    string trim(const string& str) {
+        size_t first = str.find_first_not_of(" \t\n\r");
+        size_t last = str.find_last_not_of(" \t\n\r");
+        return (first == string::npos || last == string::npos) ? "" : str.substr(first, last - first + 1);
+    }
+
+    string toLower(const string& str) {
+        string lower = str;
+        std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+        return lower;
     }
 
     
@@ -157,7 +170,6 @@ public:
             getline(ss, abiturient.address, ',');
             getline(ss, abiturient.phone_number, ',');
             getline(ss, jinsi, ',');
-            cout << "jinsi: " << jinsi;
             abiturient.jinsi = (jinsi == " erkak" ? 1 : 0);
 
             getline(ss, abiturient.fakultet, ',');
@@ -209,6 +221,8 @@ public:
 
     
     void abiturientIzlash() {
+        abiturientlar.clear();
+        loadAbituriyentsFromFile("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt");
         int id;
         cout << "Qidirilayotgan abiturientning ID raqamini kiriting: ";
         cin >> id;
@@ -238,16 +252,23 @@ public:
     }
     
     void filterByName() {
-        Abituryent abiturient;
+        abiturientlar.clear();
+        loadAbituriyentsFromFile("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt");
         string name;
-        cout<<"Ism kiriting: "; cin>>name;
+        cout << "Ism kiriting: ";
+        cin.ignore();
+        getline(cin, name);
+
+        name = toLower(trim(name));
+        
         bool topildi = false;
         
         cout << "\n";
         Table();
         
         for(int i = 0; i < abiturientlar.size(); i++) {
-            if(abiturientlar[i].ism == name) {
+            string storedName = toLower(trim(abiturientlar[i].ism));
+            if(storedName == name) {
                 cout << left
                      << setw(5) << abiturientlar[i].id
                      << setw(15) << abiturientlar[i].ism
