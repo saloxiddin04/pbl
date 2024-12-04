@@ -51,7 +51,7 @@ public:
              << setw(20) << "Til Sert."
              << setw(15) << "Til Dar."
              << endl;
-        cout << "------------------------------------------------------------------------------------------------------------------------" << endl;
+        cout << string(150, '-') << endl;
     }
     
     string getRequiredInput(string props) {
@@ -113,20 +113,18 @@ public:
         cout << "\nAbiturient muvaffaqiyatli qo'shildi!" << endl;
         
         if (file.is_open()) {
-            file << "ID: " << newAbituriyent.id << endl;
-            file << "Ism: " << newAbituriyent.ism << endl;
-            file << "Familiya: " << newAbituriyent.familiya << endl;
-            file << "Otasining ismi: " << newAbituriyent.midd_name << endl;
-            file << "Yashash manzil: " << newAbituriyent.address << endl;
-            file << "Telefon raqam: " << newAbituriyent.phone_number << endl;
-            file << "Jinsi: " << (newAbituriyent.jinsi == 1 ? "erkak" : "ayol") << endl;
-            file << "Fakultet: " << newAbituriyent.fakultet << endl;
-            file << "Fakultet tili: " << newAbituriyent.lesson_language << endl;
-            file << "Til sertifikati: " << (newAbituriyent.lang_certification.empty() ? "Yo'q" : newAbituriyent.lang_certification) << endl;
-            if (!newAbituriyent.lang_certification.empty()) {
-                file << "Til darajasi: " << newAbituriyent.lang_lavel << endl;
-            }
-            file << "----------------------" << endl;
+            file << newAbituriyent.id << ", "
+                 << newAbituriyent.ism << ", "
+                 << newAbituriyent.familiya << ", "
+                 << newAbituriyent.midd_name << ", "
+                 << newAbituriyent.address << ", "
+                 << newAbituriyent.phone_number << ", "
+                 << (newAbituriyent.jinsi == 1 ? "erkak" : "ayol") << ", "
+                 << newAbituriyent.fakultet << ", "
+                 << newAbituriyent.lesson_language << ", "
+                 << (newAbituriyent.lang_certification.empty() ? "Yo'q" : newAbituriyent.lang_certification) << ", "
+                 << (newAbituriyent.lang_certification.empty() ? "N/A" : newAbituriyent.lang_lavel)
+                 << endl;
 
             file.close();
         } else {
@@ -134,7 +132,56 @@ public:
         }
     }
     
+    void loadAbituriyentsFromFile(const string& filename) {
+        ifstream file(filename);
+
+        if (!file.is_open()) {
+            cout << "Fayl ochilmadi!" << endl;
+            return;
+        }
+
+        string line;
+        while (getline(file, line)) {
+            stringstream ss(line);
+            Abituryent abiturient;
+
+            string jinsi;
+            string lang_cert_empty_check;
+
+            getline(ss, line, ',');
+            abiturient.id = stoi(line);
+
+            getline(ss, abiturient.ism, ',');
+            getline(ss, abiturient.familiya, ',');
+            getline(ss, abiturient.midd_name, ',');
+            getline(ss, abiturient.address, ',');
+            getline(ss, abiturient.phone_number, ',');
+            getline(ss, jinsi, ',');
+            cout << "jinsi: " << jinsi;
+            abiturient.jinsi = (jinsi == " erkak" ? 1 : 0);
+
+            getline(ss, abiturient.fakultet, ',');
+            getline(ss, abiturient.lesson_language, ',');
+
+            getline(ss, lang_cert_empty_check, ',');
+            abiturient.lang_certification = (lang_cert_empty_check == "Yo'q" ? "" : lang_cert_empty_check);
+
+            if (!abiturient.lang_certification.empty()) {
+                getline(ss, abiturient.lang_lavel, ',');
+            } else {
+                abiturient.lang_lavel = "N/A";
+            }
+
+            abiturientlar.push_back(abiturient);
+        }
+
+        file.close();
+    }
+
+    
     void abiturientlarniKorish() {
+        abiturientlar.clear();
+        loadAbituriyentsFromFile("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt");
         if (abiturientlar.empty()) {
             cout << "Hozircha ro'yxatda abiturientlar yo'q." << endl;
             return;
@@ -149,7 +196,7 @@ public:
                  << setw(15) << abiturient.ism
                  << setw(15) << abiturient.familiya
                  << setw(20) << abiturient.midd_name
-                 << setw(10) << (abiturient.jinsi == 1 ? "Erkak" : "Ayol")
+                 << setw(10) << (abiturient.jinsi == 1 ? "erkak" : "ayol")
                  << setw(15) << abiturient.fakultet
                  << setw(25) << abiturient.address
                  << setw(15) << abiturient.phone_number
