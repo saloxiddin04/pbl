@@ -13,6 +13,7 @@
 #include <sstream>
 #include <fstream>
 #include <algorithm>
+#include <functional>
 
 using namespace std;
 
@@ -313,30 +314,44 @@ public:
     }
 };
 
-bool login(Abituryent & abi) {
+string hashPassword(const string& password) {
+    hash<string> hasher;
+    size_t hashValue = hasher(password);
+
+    stringstream ss;
+    ss << hex << hashValue;
+    return ss.str();
+}
+
+bool login(Abituryent& abi) {
     string username, password;
+
     const string adminUsername = "admin";
-    const string adminPassword = "admin";
-    
+    const string adminPasswordHash = "8ecb24ae920dabb0"; // admin
+
     const string employeeUsername = "employee";
-    const string employeePassword = "employee";
+    const string employeePasswordHash = "369b4f7e3e6ae43b"; // employee
+
+    cout << "username: ";
+    cin >> username;
+    cout << "password: ";
+    cin >> password;
+
+    string passwordHash = hashPassword(password);
     
-    cout << "username: "; cin >> username;
-    cout << "password: "; cin >> password;
-    
-    if (username == adminUsername && password == adminPassword) {
+    if (username == adminUsername && passwordHash == adminPasswordHash) {
         abi.setRole("admin");
         cout << "\nAdmin sifatida tizimga kirdingiz." << endl;
         return true;
-    } else if (username == employeeUsername && password == employeePassword) {
-        abi.setRole("teacher");
+    } else if (username == employeeUsername && passwordHash == employeePasswordHash) {
+        abi.setRole("employee");
         cout << "\nXodim sifatida tizimga kirdingiz." << endl;
         return true;
     } else {
         cout << "\nNoto'g'ri username yoki parol." << endl;
         return false;
     }
-};
+}
 
 void menyu() {
     Abituryent abi;
