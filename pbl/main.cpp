@@ -291,6 +291,86 @@ public:
             cout << "Bunday ismli abiturient topilmadi." << endl;
         }
     }
+    
+    void filterBySurname() {
+        abiturientlar.clear();
+        loadAbituriyentsFromFile("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt");
+        string surname;
+        cout << "Familiya kiriting: ";
+        cin.ignore();
+        getline(cin, surname);
+
+        surname = toLower(trim(surname));
+        
+        bool topildi = false;
+        
+        cout << "\n";
+        Table();
+        
+        for(int i = 0; i < abiturientlar.size(); i++) {
+            string storedSurname = toLower(trim(abiturientlar[i].familiya));
+            if(storedSurname == surname) {
+                cout << left
+                     << setw(5) << abiturientlar[i].id
+                     << setw(15) << abiturientlar[i].ism
+                     << setw(15) << abiturientlar[i].familiya
+                     << setw(20) << abiturientlar[i].midd_name
+                     << setw(10) << (abiturientlar[i].jinsi == 1 ? "Erkak" : "Ayol")
+                     << setw(15) << abiturientlar[i].fakultet
+                     << setw(25) << abiturientlar[i].address
+                     << setw(15) << abiturientlar[i].phone_number
+                     << setw(20) << abiturientlar[i].lesson_language
+                     << setw(20) << abiturientlar[i].lang_certification
+                     << setw(15) << abiturientlar[i].lang_lavel
+                     << endl;
+                topildi = true;
+            }
+        }
+
+        if (!topildi) {
+            cout << "Bunday familiyali abiturient topilmadi." << endl;
+        }
+    }
+    
+    void filterByFakultet() {
+        abiturientlar.clear();
+        loadAbituriyentsFromFile("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt");
+        string fakultet;
+        cout << "Fakultet kiriting: ";
+        cin.ignore();
+        getline(cin, fakultet);
+
+        fakultet = toLower(trim(fakultet));
+        
+        bool topildi = false;
+        
+        cout << "\n";
+        Table();
+        
+        for(int i = 0; i < abiturientlar.size(); i++) {
+            string storedFakultet = toLower(trim(abiturientlar[i].fakultet));
+            if(storedFakultet == fakultet) {
+                cout << left
+                     << setw(5) << abiturientlar[i].id
+                     << setw(15) << abiturientlar[i].ism
+                     << setw(15) << abiturientlar[i].familiya
+                     << setw(20) << abiturientlar[i].midd_name
+                     << setw(10) << (abiturientlar[i].jinsi == 1 ? "Erkak" : "Ayol")
+                     << setw(15) << abiturientlar[i].fakultet
+                     << setw(25) << abiturientlar[i].address
+                     << setw(15) << abiturientlar[i].phone_number
+                     << setw(20) << abiturientlar[i].lesson_language
+                     << setw(20) << abiturientlar[i].lang_certification
+                     << setw(15) << abiturientlar[i].lang_lavel
+                     << endl;
+                topildi = true;
+            }
+        }
+
+        if (!topildi) {
+            cout << "Bu fakultetda abiturientlar mavjud emas!" << endl;
+        }
+    }
 
     void abiturientFilter() {
         int select;
@@ -306,6 +386,12 @@ public:
             switch(select) {
                 case 1:
                     filterByName();
+                    break;
+                case 2:
+                    filterBySurname();
+                    break;
+                case 3:
+                    filterByFakultet();
                     break;
                 default:
                     cout << "Noto'g'ri tanlov, qaytadan urinib ko'ring." << endl;
