@@ -14,6 +14,7 @@
 #include <fstream>
 #include <algorithm>
 #include <functional>
+#include <unordered_map>
 
 using namespace std;
 
@@ -31,12 +32,17 @@ private:
     string lang_certification;
     string lang_lavel;
     string role;
+    string login;
     
 public:
     vector<Abituryent> abiturientlar;
     
     void setRole(const string& userRole) {
         role = userRole;
+    }
+    
+    void setLogin(const string & userLogin) {
+        login = userLogin;
     }
     
     void Table() {
@@ -85,8 +91,8 @@ public:
     void createAbiturient() {
         
         ofstream file("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt", ios::app);
-        
-        if (role != "admin") {
+                
+        if (role != "admin" && role != "abiturient") {
             cout << "\nSizda abiturient qo'shish huquqi yo'q." << endl;
             return;
         }
@@ -122,6 +128,8 @@ public:
         if (!newAbituriyent.lang_certification.empty()) {
             newAbituriyent.lang_lavel = getRequiredInput("Til darajasini kiriting(A1, B1, C1): ");
         }
+        
+        newAbituriyent.login = login;
 
         abiturientlar.push_back(newAbituriyent);
         cout << "\nAbiturient muvaffaqiyatli qo'shildi!" << endl;
@@ -137,9 +145,8 @@ public:
                  << newAbituriyent.fakultet << ", "
                  << newAbituriyent.lesson_language << ", "
                  << (newAbituriyent.lang_certification.empty() ? "Yo'q" : newAbituriyent.lang_certification) << ", "
-                 << (newAbituriyent.lang_certification.empty() ? "N/A" : newAbituriyent.lang_lavel)
-                 << endl;
-
+                 << (newAbituriyent.lang_certification.empty() ? "N/A" : newAbituriyent.lang_lavel) << ", "
+                 << newAbituriyent.login << endl;
             file.close();
         } else {
             cout << "Fayl ochilmadi!" << endl;
@@ -409,6 +416,90 @@ string hashPassword(const string& password) {
     return ss.str();
 }
 
+bool authAbiturient(Abituryent & abi) {
+    ofstream file("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/users.txt", ios::app);
+    
+    string login, password;
+    
+    cout << "login: "; cin >> login;
+    cout << "password: "; cin >> password;
+    
+    if (file.is_open()) {
+        file << login << ", "<< hashPassword(password) << endl;
+        file.close();
+    } else {
+        cout << "Fayl ochilmadi!" << endl;
+    }
+    abi.setRole("abiturient");
+    abi.setLogin(login);
+    
+    cout << "\nMuvofaqqiyatli ro'yhatdan o'tdingiz! \n" << endl;
+    
+    abi.createAbiturient();
+    return true;
+}
+
+unordered_map<string, string> loadUsers(const string& filename) {
+    unordered_map<string, string> users;
+    ifstream file(filename);
+
+    if (!file.is_open()) {
+        cerr << "Error: Could not open file: " << filename << endl;
+        return users;
+    }
+
+    string line;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string username, passwordHash;
+
+        if (getline(ss, username, ',') && getline(ss, passwordHash)) {
+            username.erase(username.find_last_not_of(" \n\r\t") + 1);
+            passwordHash.erase(passwordHash.find_last_not_of(" \n\r\t") + 1);
+            users[username] = passwordHash;
+        } else {
+            cerr << "Error: Invalid line in users.txt: " << line << endl;
+        }
+    }
+
+    file.close();
+    return users;
+}
+
+bool signIn(const unordered_map<string, string>& users) {
+    Abituryent abi;
+    string username, password;
+
+    cout << "login: ";
+    cin >> username;
+    cout << "password: ";
+    cin >> password;
+
+    string enteredHash = hashPassword(password);
+
+    auto it = users.find(username);
+    if (it != users.end()) {
+        if (abi.trim(it->second) == abi.trim(enteredHash)) {
+            cout << "Muvofaqqiyatli kirildi. Xush kelibsiz, " << username << "!" << endl;
+            if (username == "admin") {
+                abi.setRole("admin");
+            } else if(username == "employee") {
+                abi.setRole("employee");
+            } else {
+                abi.setRole("abiturient");
+            }
+            return true;
+        } else {
+            cout << "Password hash does not match!" << endl;
+        }
+    } else {
+        cout << "Username not found!" << endl;
+    }
+
+    cout << "Noto'g'ri login yoki password!" << endl;
+    return false;
+}
+
 bool login(Abituryent& abi) {
     string username, password;
 
@@ -440,42 +531,77 @@ bool login(Abituryent& abi) {
 }
 
 void menyu() {
+    unordered_map<string, string> users = loadUsers("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/users.txt");
     Abituryent abi;
     
-    if (!login(abi)) {
-        return;
-    }
-    
-    int tanlov;
-    do {
+    while (true) {
+        int role;
         cout << "\n====== Abiturientlarni ro'yxatga olish tizimi ======" << endl;
-        cout << "1. Abiturient qo'shish" << endl;
-        cout << "2. Abiturientlarni ko'rish" << endl;
-        cout << "3. Abiturient izlash" << endl;
-        cout << "4. Abiturient filterlash" << endl;
+        cout << "1. Admin sifatida kirish" << endl;
+        cout << "2. Xodim sifatida kirish" << endl;
+        cout << "3. Abiturient sifatida kirish" << endl;
+        cout << "4. Abiturient sifatida ro'yhatdan o'tish" << endl;
         cout << "5. Chiqish" << endl;
         cout << "Tanlovingizni kiriting: ";
-        cin >> tanlov;
-        switch (tanlov) {
+        
+        cin >> role;
+        
+        switch (role) {
             case 1:
-                abi.createAbiturient();
+                if (!login(abi)) {
+                    continue;
+                };
                 break;
             case 2:
-                abi.abiturientlarniKorish();
+                if (!login(abi)) {
+                    return;
+                };
                 break;
             case 3:
-                abi.abiturientIzlash();
+                signIn(users);
                 break;
             case 4:
-                abi.abiturientFilter();
+                authAbiturient(abi);
                 break;
             case 5:
-                cout << "Tizimdan chiqildi." << endl;
-                break;
+                cout << "Dasturdan chiqildi." << endl;
+                return;
             default:
-                cout << "Noto'g'ri tanlov, qaytadan urinib ko'ring." << endl;
+                cout << "Noto'g'ri tanlov, iltimos qaytadan urinib ko'ring." << endl;
+                continue;
         }
-    } while (tanlov != 5);
+        
+        int tanlov;
+        do {
+            cout << "\n====== Abiturientlarni ro'yxatga olish tizimi ======" << endl;
+            cout << "1. Abiturient qo'shish" << endl;
+            cout << "2. Abiturientlarni ko'rish" << endl;
+            cout << "3. Abiturient izlash" << endl;
+            cout << "4. Abiturient filterlash" << endl;
+            cout << "5. Chiqish" << endl;
+            cout << "Tanlovingizni kiriting: ";
+            cin >> tanlov;
+            switch (tanlov) {
+                case 1:
+                    abi.createAbiturient();
+                    break;
+                case 2:
+                    abi.abiturientlarniKorish();
+                    break;
+                case 3:
+                    abi.abiturientIzlash();
+                    break;
+                case 4:
+                    abi.abiturientFilter();
+                    break;
+                case 5:
+                    cout << "Login menyusiga qaytilmoqda..." << endl;
+                    break;
+                default:
+                    cout << "Noto'g'ri tanlov, qaytadan urinib ko'ring." << endl;
+            }
+        } while (tanlov != 5);
+    };
 }
 
 int main() {
