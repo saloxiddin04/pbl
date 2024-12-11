@@ -45,6 +45,35 @@ public:
         login = userLogin;
     }
     
+    string getRole() {
+        return role;
+    }
+    
+    string getLogin() {
+        ifstream file("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt");
+        
+        if (!file.is_open()) {
+            cout << "Fayl ochishda xatolik!" << endl;
+            return "";
+        }
+        
+        string line;
+        string login;
+        while (getline(file, line)) {
+            stringstream ss(line);
+            string token;
+            
+            while (getline(ss, token, ',')) {
+                login = token;
+            }
+            
+            trim(login);
+        }
+        
+        file.close();
+        return login;
+    }
+    
     void Table() {
         cout << left
              << setw(5) << "ID"
@@ -89,9 +118,10 @@ public:
 
     
     void createAbiturient() {
-        
+        abiturientlar.clear();
         ofstream file("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt", ios::app);
-                
+        loadAbituriyentsFromFile("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt");
+    
         if (role != "admin" && role != "abiturient") {
             cout << "\nSizda abiturient qo'shish huquqi yo'q." << endl;
             return;
@@ -191,7 +221,10 @@ public:
             } else {
                 abiturient.lang_lavel = "N/A";
             }
-
+            
+            getline(ss, abiturient.login, ',');
+            abiturient.role = "abiturient";
+            
             abiturientlar.push_back(abiturient);
         }
 
@@ -224,6 +257,35 @@ public:
                  << setw(20) << abiturient.lang_certification
                  << setw(15) << abiturient.lang_lavel
                  << endl;
+        }
+    }
+    
+    void abiturientByLogin() {
+        abiturientlar.clear();
+        loadAbituriyentsFromFile("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt");
+
+        bool topildi = false;
+        for (const auto& abiturient : abiturientlar) {
+            if (trim(abiturient.login) == trim(getLogin())) {
+                cout << "ID: " << abiturient.id << endl;
+                cout << "Ism: " << abiturient.ism << endl;
+                cout << "Familiya: " << abiturient.familiya << endl;
+                cout << "Otasi ismi: " << abiturient.midd_name << endl;
+                cout << "Telefon raqam: " << abiturient.phone_number << endl;
+                cout << "Yashash manzil: " << abiturient.address << endl;
+                cout << "Jinsi: " << (abiturient.jinsi == 1 ? "Erkak" : "Ayol") << endl;
+                cout << "Fakultet: " << abiturient.fakultet << endl;
+                cout << "Dars tili: " << abiturient.lesson_language << endl;
+                cout << "Til sertifikati: " << abiturient.lang_certification << endl;
+                cout << "Til darajasi: " << abiturient.lang_lavel << endl;
+                cout << "Login: " << abiturient.login << endl;
+                topildi = true;
+                break;
+            }
+        }
+
+        if (!topildi) {
+            cout << "Bunday login topilmadi." << endl;
         }
     }
 
@@ -416,12 +478,46 @@ string hashPassword(const string& password) {
     return ss.str();
 }
 
+unordered_map<string, string> loadUsers(const string& filename) {
+    unordered_map<string, string> users;
+    Abituryent abi;
+    ifstream file(filename);
+
+    if (!file.is_open()) {
+        cerr << "Error: Could not open file: " << filename << endl;
+        return users;
+    }
+
+    string line;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string username, passwordHash;
+
+        if (getline(ss, username, ',') && getline(ss, passwordHash)) {
+            users[abi.trim(username)] = abi.trim(passwordHash);
+            abi.setRole("abiturient");
+        } else {
+            cerr << "Error: Invalid line in users.txt: " << line << endl;
+        }
+    }
+
+    file.close();
+    return users;
+}
+
 bool authAbiturient(Abituryent & abi) {
     ofstream file("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/users.txt", ios::app);
-    
+    unordered_map<string, string> users = loadUsers("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/users.txt");
+
     string login, password;
     
     cout << "login: "; cin >> login;
+    
+    if (users.find(login) != users.end()) {
+        cout << "Bunday login allaqachon mavjud. Iltimos boshqa login kiriting.\n" << endl;
+        return false;
+    }
+    
     cout << "password: "; cin >> password;
     
     if (file.is_open()) {
@@ -436,34 +532,9 @@ bool authAbiturient(Abituryent & abi) {
     cout << "\nMuvofaqqiyatli ro'yhatdan o'tdingiz! \n" << endl;
     
     abi.createAbiturient();
+    
+    abi.abiturientByLogin();
     return true;
-}
-
-unordered_map<string, string> loadUsers(const string& filename) {
-    unordered_map<string, string> users;
-    ifstream file(filename);
-
-    if (!file.is_open()) {
-        cerr << "Error: Could not open file: " << filename << endl;
-        return users;
-    }
-
-    string line;
-    while (getline(file, line)) {
-        stringstream ss(line);
-        string username, passwordHash;
-
-        if (getline(ss, username, ',') && getline(ss, passwordHash)) {
-            username.erase(username.find_last_not_of(" \n\r\t") + 1);
-            passwordHash.erase(passwordHash.find_last_not_of(" \n\r\t") + 1);
-            users[username] = passwordHash;
-        } else {
-            cerr << "Error: Invalid line in users.txt: " << line << endl;
-        }
-    }
-
-    file.close();
-    return users;
 }
 
 bool signIn(const unordered_map<string, string>& users) {
@@ -480,14 +551,10 @@ bool signIn(const unordered_map<string, string>& users) {
     auto it = users.find(username);
     if (it != users.end()) {
         if (abi.trim(it->second) == abi.trim(enteredHash)) {
-            cout << "Muvofaqqiyatli kirildi. Xush kelibsiz, " << username << "!" << endl;
-            if (username == "admin") {
-                abi.setRole("admin");
-            } else if(username == "employee") {
-                abi.setRole("employee");
-            } else {
-                abi.setRole("abiturient");
-            }
+            abi.setLogin(username);
+            abi.setRole("abiturient");
+            cout << "Muvofaqqiyatli kirildi. Xush kelibsiz, " << username << "!\n" << endl;
+            abi.abiturientByLogin();
             return true;
         } else {
             cout << "Password hash does not match!" << endl;
@@ -570,37 +637,40 @@ void menyu() {
                 cout << "Noto'g'ri tanlov, iltimos qaytadan urinib ko'ring." << endl;
                 continue;
         }
+                
+        if (abi.getRole() != "abiturient" && abi.getRole() == " ") {
+            int tanlov;
+            do {
+                cout << "\n====== Abiturientlarni ro'yxatga olish tizimi ======" << endl;
+                cout << "1. Abiturient qo'shish" << endl;
+                cout << "2. Abiturientlarni ko'rish" << endl;
+                cout << "3. Abiturient izlash" << endl;
+                cout << "4. Abiturient filterlash" << endl;
+                cout << "5. Chiqish" << endl;
+                cout << "Tanlovingizni kiriting: ";
+                cin >> tanlov;
+                switch (tanlov) {
+                    case 1:
+                        abi.createAbiturient();
+                        break;
+                    case 2:
+                        abi.abiturientlarniKorish();
+                        break;
+                    case 3:
+                        abi.abiturientIzlash();
+                        break;
+                    case 4:
+                        abi.abiturientFilter();
+                        break;
+                    case 5:
+                        cout << "Login menyusiga qaytilmoqda..." << endl;
+                        break;
+                    default:
+                        cout << "Noto'g'ri tanlov, qaytadan urinib ko'ring." << endl;
+                }
+            } while (tanlov != 5);
+        }
         
-        int tanlov;
-        do {
-            cout << "\n====== Abiturientlarni ro'yxatga olish tizimi ======" << endl;
-            cout << "1. Abiturient qo'shish" << endl;
-            cout << "2. Abiturientlarni ko'rish" << endl;
-            cout << "3. Abiturient izlash" << endl;
-            cout << "4. Abiturient filterlash" << endl;
-            cout << "5. Chiqish" << endl;
-            cout << "Tanlovingizni kiriting: ";
-            cin >> tanlov;
-            switch (tanlov) {
-                case 1:
-                    abi.createAbiturient();
-                    break;
-                case 2:
-                    abi.abiturientlarniKorish();
-                    break;
-                case 3:
-                    abi.abiturientIzlash();
-                    break;
-                case 4:
-                    abi.abiturientFilter();
-                    break;
-                case 5:
-                    cout << "Login menyusiga qaytilmoqda..." << endl;
-                    break;
-                default:
-                    cout << "Noto'g'ri tanlov, qaytadan urinib ko'ring." << endl;
-            }
-        } while (tanlov != 5);
     };
 }
 
