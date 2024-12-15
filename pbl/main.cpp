@@ -124,15 +124,38 @@ public:
     
     void createAbiturient() {
         abiturientlar.clear();
-        ofstream file("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt", ios::app);
-        loadAbituriyentsFromFile("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt");
+//        ofstream file("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt", ios::app);
+//        loadAbituriyentsFromFile("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt");
+        
+        ifstream file("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt", ios::in);
+        int lastId = 0;
+
+        if (file.is_open()) {
+            string line;
+            while (getline(file, line)) {
+                stringstream ss(line);
+                int currentId;
+                ss >> currentId;
+                if (currentId > lastId) {
+                    lastId = currentId;
+                }
+            }
+            file.close();
+        }
+        
+        ofstream outFile("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt", ios::app);
+        if (!outFile.is_open()) {
+            cout << "Fayl ochilmadi!" << endl;
+            return;
+        }
     
         if (role != "admin" && role != "abiturient") {
             cout << "\nSizda abiturient qo'shish huquqi yo'q." << endl;
             return;
         }
         Abituryent newAbituriyent;
-        newAbituriyent.id = abiturientlar.size() + 1;
+        
+        newAbituriyent.id = lastId + 1;
         cin.ignore();
         
         newAbituriyent.ism = getRequiredInput("Ism kiriting: ");
@@ -164,13 +187,17 @@ public:
             newAbituriyent.lang_lavel = getRequiredInput("Til darajasini kiriting(A1, B1, C1): ");
         }
         
-        newAbituriyent.login = this->login;
+        if (role == "abiturient") {
+            newAbituriyent.login = login;
+        } else {
+            newAbituriyent.login = "";
+        }
 
         abiturientlar.push_back(newAbituriyent);
         cout << "\nAbiturient muvaffaqiyatli qo'shildi!" << endl;
         
-        if (file.is_open()) {
-            file << newAbituriyent.id << ", "
+        if (outFile.is_open()) {
+            outFile << newAbituriyent.id << ", "
                  << newAbituriyent.ism << ", "
                  << newAbituriyent.familiya << ", "
                  << newAbituriyent.midd_name << ", "
@@ -195,8 +222,11 @@ public:
             cout << "Fayl ochilmadi!" << endl;
             return;
         }
-
+        
         string line;
+        
+        getline(file, line);
+        
         while (getline(file, line)) {
             stringstream ss(line);
             Abituryent abiturient;
@@ -534,6 +564,9 @@ bool authAbiturient(Abituryent & abi) {
     } else {
         cout << "Fayl ochilmadi!" << endl;
     }
+    
+    users = loadUsers("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/users.txt");
+    
     abi.setRole("abiturient");
     abi.setLogin(login);
     
@@ -559,6 +592,7 @@ bool signIn(const unordered_map<string, string>& users) {
     string enteredHash = hashPassword(password);
 
     auto it = users.find(username);
+    
     if (it != users.end()) {
         if (abi.trim(it->second) == abi.trim(enteredHash)) {
             abi.setLogin(abi.trim(username));
@@ -631,6 +665,7 @@ void menyu() {
                 }
                 break;
             case 3:
+                users = loadUsers("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/users.txt");
                 signIn(users);
                 break;
             case 4:

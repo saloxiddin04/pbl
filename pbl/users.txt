@@ -1,5 +1,2 @@
 admin, 8ecb24ae920dabb0
 employee, 369b4f7e3e6ae43b
-salox, a45ffd4b5e0248ab
-test, 9e64c1ce42d650f1
-munisa, a45ffd4b5e0248ab
