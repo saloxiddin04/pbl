@@ -58,17 +58,19 @@ public:
         }
         
         string line;
-        string login;
+        string log;
         while (getline(file, line)) {
             stringstream ss(line);
             string token;
             
             while (getline(ss, token, ',')) {
-                login = token;
+                log = token;
             }
             
-            trim(login);
+            trim(log);
         }
+        
+        login = log;
         
         file.close();
         return login;
@@ -495,6 +497,7 @@ unordered_map<string, string> loadUsers(const string& filename) {
 
         if (getline(ss, username, ',') && getline(ss, passwordHash)) {
             users[abi.trim(username)] = abi.trim(passwordHash);
+            abi.setLogin(username);
             abi.setRole("abiturient");
         } else {
             cerr << "Error: Invalid line in users.txt: " << line << endl;
@@ -612,17 +615,13 @@ void menyu() {
         cout << "Tanlovingizni kiriting: ";
         
         cin >> role;
-        
+
         switch (role) {
             case 1:
-                if (!login(abi)) {
-                    continue;
-                };
-                break;
             case 2:
                 if (!login(abi)) {
-                    return;
-                };
+                    continue;
+                }
                 break;
             case 3:
                 signIn(users);
@@ -637,11 +636,11 @@ void menyu() {
                 cout << "Noto'g'ri tanlov, iltimos qaytadan urinib ko'ring." << endl;
                 continue;
         }
-                
-        if (abi.getRole() != "abiturient" && abi.getRole() == " ") {
+
+        if (abi.getRole() == "admin" || abi.getRole() == "employee") {
             int tanlov;
             do {
-                cout << "\n====== Abiturientlarni ro'yxatga olish tizimi ======" << endl;
+                cout << "\n====== Admin/Xodim menyusi ======" << endl;
                 cout << "1. Abiturient qo'shish" << endl;
                 cout << "2. Abiturientlarni ko'rish" << endl;
                 cout << "3. Abiturient izlash" << endl;
@@ -649,6 +648,7 @@ void menyu() {
                 cout << "5. Chiqish" << endl;
                 cout << "Tanlovingizni kiriting: ";
                 cin >> tanlov;
+
                 switch (tanlov) {
                     case 1:
                         abi.createAbiturient();
@@ -670,9 +670,9 @@ void menyu() {
                 }
             } while (tanlov != 5);
         }
-        
-    };
+    }
 }
+
 
 int main() {
     menyu();
