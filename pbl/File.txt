@@ -1,6 +1,6 @@
-1, Saloxiddin, Sayfuddinov, Fazliddin o'g'li, Toshkent sh Yunusobod t, +998998774212, erkak, isee, uz, Yo'q, N/A, Saloxiddin
+1, Saloxiddin, Sayfuddinov, Fazliddin o'g'li, Toshkent sh Yunusobod t, +998998774212, erkak, isee, uz, Yo'q, N/A,
 2, Salox, Sayfuddinov, xxx, Toshkent sh, 9999999999999, erkak, isee, ru, Yo'q, N/A, 
 3, test, testov, testovich, test sh, 9999990000999, ayol, pri, uz, Yo'q, N/A, salox
 4, asdas, asdad, asdasd, asdas, 2309423, ayol, asdad, uz, Yo'q, N/A, test
 5, Munisa, Sayfuddinova, Fazliddin qizi, Toshkent sh Yunusobod t, +998998774212, ayol, prip, uz, Yo'q, N/A, 
-6, Munisa, Sayfuddinova, xxx, Toshkent sh, +9989954213�, ayol, med, ru, Yo'q, N/A, munisa
+6, Munisa, Sayfuddinova, Fazliddin qizi, Toshkent sh, +998999954213, ayol, med, uz, Yo'q, N/A, munisa

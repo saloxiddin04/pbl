@@ -118,6 +118,9 @@ public:
         return lower;
     }
 
+    void clearAbiturientlar() {
+        abiturientlar.clear();
+    }
     
     void createAbiturient() {
         abiturientlar.clear();
@@ -161,7 +164,7 @@ public:
             newAbituriyent.lang_lavel = getRequiredInput("Til darajasini kiriting(A1, B1, C1): ");
         }
         
-        newAbituriyent.login = login;
+        newAbituriyent.login = this->login;
 
         abiturientlar.push_back(newAbituriyent);
         cout << "\nAbiturient muvaffaqiyatli qo'shildi!" << endl;
@@ -262,13 +265,13 @@ public:
         }
     }
     
-    void abiturientByLogin() {
+    void abiturientByLogin(const string & username) {
         abiturientlar.clear();
         loadAbituriyentsFromFile("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/File.txt");
 
         bool topildi = false;
         for (const auto& abiturient : abiturientlar) {
-            if (trim(abiturient.login) == trim(getLogin())) {
+            if (trim(abiturient.login) == trim(username)) {
                 cout << "ID: " << abiturient.id << endl;
                 cout << "Ism: " << abiturient.ism << endl;
                 cout << "Familiya: " << abiturient.familiya << endl;
@@ -511,6 +514,8 @@ unordered_map<string, string> loadUsers(const string& filename) {
 bool authAbiturient(Abituryent & abi) {
     ofstream file("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/users.txt", ios::app);
     unordered_map<string, string> users = loadUsers("/Users/saloxiddinsayfuddinov/Documents/c++/PBL/pbl/pbl/users.txt");
+    
+    abi.clearAbiturientlar();
 
     string login, password;
     
@@ -536,12 +541,14 @@ bool authAbiturient(Abituryent & abi) {
     
     abi.createAbiturient();
     
-    abi.abiturientByLogin();
+    abi.abiturientByLogin(login);
     return true;
 }
 
 bool signIn(const unordered_map<string, string>& users) {
     Abituryent abi;
+    abi.clearAbiturientlar();
+    
     string username, password;
 
     cout << "login: ";
@@ -554,10 +561,10 @@ bool signIn(const unordered_map<string, string>& users) {
     auto it = users.find(username);
     if (it != users.end()) {
         if (abi.trim(it->second) == abi.trim(enteredHash)) {
-            abi.setLogin(username);
+            abi.setLogin(abi.trim(username));
             abi.setRole("abiturient");
             cout << "Muvofaqqiyatli kirildi. Xush kelibsiz, " << username << "!\n" << endl;
-            abi.abiturientByLogin();
+            abi.abiturientByLogin(username);
             return true;
         } else {
             cout << "Password hash does not match!" << endl;
